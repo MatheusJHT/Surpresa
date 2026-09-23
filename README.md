@@ -119,6 +119,8 @@ O bucket `romantic-site` é público apenas para leitura das imagens do carrosse
 4. Publique o projeto.
 5. Configure o domínio da Vercel em **Authentication > URL Configuration** no Supabase.
 
+O arquivo `vercel.json` mantém as rotas SPA, como `/admin`, `/jornada` e `/presente/:id`, funcionando quando abertas diretamente ou atualizadas no navegador.
+
 ## Estrutura principal
 
 ```text
