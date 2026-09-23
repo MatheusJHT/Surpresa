@@ -129,6 +129,13 @@ h1 span { color: var(--rose-dark); display: block; font-style: italic; }
 .present-form .primary-button { border: 0; cursor: pointer; justify-content: center; margin-top: 14px; }
 .success-content { margin: 28px auto 34px; max-width: 520px; }
 .success-mark { align-items: center; color: var(--rose-dark); display: flex; font-family: 'Playfair Display', serif; font-size: 1.6rem; gap: 8px; justify-content: center; }
+.opened-gift { align-items: center; background: #f2e0df; border: 1px solid var(--rose); border-radius: 50%; color: var(--rose-dark); display: flex; height: 112px; justify-content: center; margin: 0 auto 24px; position: relative; width: 112px; }
+.gift-spark { color: var(--rose-dark); font-size: 1.15rem; position: absolute; }
+.gift-spark-one { right: 8px; top: 12px; }
+.gift-spark-two { left: 8px; top: 30px; }
+.success-message { line-height: 1.7; margin: 18px auto; max-width: 480px; }
+.day-message { color: var(--rose-dark); font-family: 'Playfair Display', serif; font-size: 1.45rem; margin: 24px 0 12px; }
+.hint-collection { color: var(--muted); font-size: 0.86rem; line-height: 1.65; margin: 0 auto; max-width: 470px; }
 .final-celebration { position: relative; }
 .heart-burst { color: var(--rose-dark); display: flex; gap: 15px; justify-content: center; margin: 0 auto 22px; }
 .heart-burst span { display: inline-block; font-size: 1rem; }

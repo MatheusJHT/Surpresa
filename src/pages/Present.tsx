@@ -1,4 +1,4 @@
-import { ArrowLeft, Heart, KeyRound, Send } from 'lucide-react'
+import { ArrowLeft, Gift, Heart, KeyRound, Send } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
@@ -99,5 +99,16 @@ function SuccessContent({ content, isFinal, finalMessage }: { content: PresentCo
     </div>
   }
 
-  return <div className="success-content"><p className="success-mark">Você acertou. <Heart size={17} fill="currentColor" /></p><p>{content?.success_message}</p><div className="riddle-box"><span className="eyebrow">O próximo passo</span><p>{content?.riddle}</p>{content?.hint && <small>Dica: {content.hint}</small>}</div></div>
+  return <div className="success-content">
+    <motion.div className="opened-gift" initial={{ scale: 0.7, rotate: -5, opacity: 0 }} animate={{ scale: 1, rotate: 0, opacity: 1 }} transition={{ type: 'spring', stiffness: 180, damping: 12 }} aria-label="Presente aberto">
+      <Gift size={42} strokeWidth={1.5} aria-hidden="true" />
+      <span className="gift-spark gift-spark-one" aria-hidden="true">✦</span>
+      <span className="gift-spark gift-spark-two" aria-hidden="true">✦</span>
+    </motion.div>
+    <p className="success-mark">Presente aberto. <Heart size={17} fill="currentColor" /></p>
+    <p className="success-message">{content?.success_message}</p>
+    <p className="day-message">Agora aproveite o seu dia.</p>
+    <p className="hint-collection">Acho que já vou ter feito o pedido, mas caso não, junte as letras de todas as dicas e terá uma surpresa muito grande. Heheheh.</p>
+    <div className="riddle-box"><span className="eyebrow">O próximo passo</span><p>{content?.riddle}</p>{content?.hint && <small>Dica: {content.hint}</small>}</div>
+  </div>
 }
