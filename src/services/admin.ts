@@ -9,7 +9,10 @@ export async function isCurrentUserAdmin() {
 
 async function adminRequest<T>(body: Record<string, unknown>) {
   const { data, error } = await supabase.functions.invoke<T>('admin-api', { body })
-  if (error) throw error
+  if (error) {
+    const detail = error.message || 'A função administrativa não respondeu.'
+    throw new Error(`${detail} Verifique se a Edge Function admin-api foi publicada.`)
+  }
   return data as T
 }
 

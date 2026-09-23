@@ -94,6 +94,12 @@ supabase functions deploy get-present-content
 supabase functions deploy admin-api
 ```
 
+Após alterar uma Edge Function, publique-a novamente. O deploy da Vercel não publica funções Supabase:
+
+```bash
+supabase functions deploy admin-api
+```
+
 As funções usam automaticamente `SUPABASE_URL`, `SUPABASE_ANON_KEY` e `SUPABASE_SERVICE_ROLE_KEY` fornecidas pelo ambiente Supabase. O último segredo só existe no backend da função.
 
 ## Fluxo de segurança

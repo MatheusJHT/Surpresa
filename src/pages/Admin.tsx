@@ -19,7 +19,7 @@ export function AdminPage() {
 
   async function load() {
     setLoading(true)
-    try { setOverview(await getAdminOverview()); setError('') } catch { setError('Não foi possível carregar o painel.') } finally { setLoading(false) }
+    try { setOverview(await getAdminOverview()); setError('') } catch (loadError) { setError(loadError instanceof Error ? loadError.message : 'Não foi possível carregar o painel.') } finally { setLoading(false) }
   }
 
   useEffect(() => { void load() }, [])
