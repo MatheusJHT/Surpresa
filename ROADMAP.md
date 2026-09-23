@@ -72,7 +72,7 @@ Ao finalizar cada parte:
 ## Status
 
 - [x] Parte 1 — Roadmap e fundação do repositório
-- [ ] Parte 2 — Scaffold do frontend
+- [x] Parte 2 — Scaffold do frontend
 - [ ] Parte 3 — Modelo de dados e segurança Supabase
 - [ ] Parte 4 — Autenticação e camada de serviços
 - [ ] Parte 5 — Home e jornada visual
