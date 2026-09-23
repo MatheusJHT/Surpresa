@@ -69,11 +69,24 @@ function SettingsEditor({ settings, onSaved }: { settings: NonNullable<AdminOver
 
 function PhotoEditor({ overview, onSaved }: { overview: AdminOverview | null; onSaved: () => Promise<void> }) {
   const [uploading, setUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
   const [caption, setCaption] = useState('')
   const [photoError, setPhotoError] = useState('')
-  async function addPhoto(file: File) {
-    setUploading(true); setPhotoError('')
-    try { const uploaded = await uploadCarouselImage(file); await createAdminCarousel({ image_url: uploaded.url, caption, display_order: overview?.carousel.length ?? 0 }); setCaption(''); await onSaved() } catch { setPhotoError('Não foi possível enviar essa foto.') } finally { setUploading(false) }
+  async function addPhotos(files: File[]) {
+    if (files.length === 0) return
+    setUploading(true); setUploadProgress(0); setPhotoError('')
+    try {
+      const startOrder = overview?.carousel.length ?? 0
+      for (const [index, file] of files.entries()) {
+        const uploaded = await uploadCarouselImage(file)
+        await createAdminCarousel({ image_url: uploaded.url, caption, display_order: startOrder + index })
+        setUploadProgress(index + 1)
+      }
+      setCaption('')
+      await onSaved()
+    } catch {
+      setPhotoError('Algumas fotos podem não ter sido enviadas. Verifique o carrossel e tente novamente.')
+    } finally { setUploading(false) }
   }
   async function replacePhoto(image: AdminCarouselImage, file: File) {
     setUploading(true); setPhotoError('')
@@ -83,7 +96,7 @@ function PhotoEditor({ overview, onSaved }: { overview: AdminOverview | null; on
     if (!window.confirm('Excluir esta foto do carrossel?')) return
     try { const path = storagePathFromUrl(image.image_url); if (path) await removeCarouselImage(path); await deleteAdminCarousel(image.id); await onSaved() } catch { setPhotoError('Não foi possível excluir essa foto.') }
   }
-  return <div className="photo-manager"><div className="upload-panel"><p className="eyebrow">Nova memória</p><label className="upload-button"><Upload size={16} /> {uploading ? 'Enviando...' : 'Escolher foto'}<input type="file" accept="image/jpeg,image/png,image/webp" disabled={uploading} onChange={(event) => { const file = event.target.files?.[0]; if (file) void addPhoto(file) }} /></label><label>Legenda<input value={caption} onChange={(event) => setCaption(event.target.value)} placeholder="Uma frase para acompanhar a foto" /></label></div>{photoError && <p className="form-error" role="alert">{photoError}</p>}<div className="photo-grid">{(overview?.carousel ?? []).map((image) => <article className="photo-item" key={image.id}><img src={image.image_url} alt={image.caption ?? 'Foto da memória'} /><div><span>{image.caption || 'Sem legenda'}</span><label className="replace-button">Substituir<input type="file" accept="image/jpeg,image/png,image/webp" disabled={uploading} onChange={(event) => { const file = event.target.files?.[0]; if (file) void replacePhoto(image, file) }} /></label><button type="button" className="icon-danger" aria-label="Excluir foto" onClick={() => void removePhoto(image)}><Trash2 size={16} /></button></div></article>)}</div></div>
+  return <div className="photo-manager"><div className="upload-panel"><p className="eyebrow">Novas memórias</p><label className="upload-button"><Upload size={16} /> {uploading ? `Enviando ${uploadProgress} foto(s)...` : 'Escolher várias fotos'}<input type="file" accept="image/jpeg,image/png,image/webp" multiple disabled={uploading} onChange={(event) => { void addPhotos(Array.from(event.target.files ?? [])); event.currentTarget.value = '' }} /></label><label>Legenda opcional<input value={caption} onChange={(event) => setCaption(event.target.value)} placeholder="Uma frase para acompanhar as fotos" /></label><small className="upload-help">Você pode selecionar várias imagens de uma vez. A legenda será aplicada a todas.</small></div>{photoError && <p className="form-error" role="alert">{photoError}</p>}<div className="photo-grid">{(overview?.carousel ?? []).map((image) => <article className="photo-item" key={image.id}><img src={image.image_url} alt={image.caption ?? 'Foto da memória'} /><div><span>{image.caption || 'Sem legenda'}</span><label className="replace-button">Substituir<input type="file" accept="image/jpeg,image/png,image/webp" disabled={uploading} onChange={(event) => { const file = event.target.files?.[0]; if (file) void replacePhoto(image, file) }} /></label><button type="button" className="icon-danger" aria-label="Excluir foto" onClick={() => void removePhoto(image)}><Trash2 size={16} /></button></div></article>)}</div></div>
 }
 
 function ProgressPanel({ overview, onReset }: { overview: AdminOverview | null; onReset: () => Promise<void> }) { return <div className="admin-panel"><div className="section-heading"><div><p className="eyebrow">Acompanhamento</p><h2>{overview?.progress.filter((item) => item.completed).length ?? 0} capítulos concluídos</h2></div><button className="danger-button" type="button" onClick={() => void onReset()}>Resetar jornada</button></div><div className="progress-table">{(overview?.progress ?? []).map((item) => <div key={item.id}><span>{item.present_id}</span><strong>{item.completed ? 'Concluído' : item.password_verified ? 'Pergunta pendente' : 'Aguardando senha'}</strong><small>{item.attempts} tentativas</small></div>)}</div></div> }
