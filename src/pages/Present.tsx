@@ -108,6 +108,8 @@ function SuccessContent({ content, isFinal, finalMessage }: { content: PresentCo
       <p className="final-count">19 / 19</p>
       <p className="success-mark">Você chegou até o fim. <Heart size={17} fill="currentColor" /></p>
       <p className="final-message">{finalMessage}</p>
+      <p className="day-message">Agora aproveite o seu dia.</p>
+      <p className="hint-collection">Acho que já vou ter feito o pedido, mas caso não, junte as letras de todas as dicas e terá uma surpresa muito grande. Heheheh.</p>
       <div className="riddle-box"><span className="eyebrow">O presente final</span><p>{content?.success_message}</p><small>Obrigada por viver cada capítulo comigo.</small></div>
     </div>
   }
@@ -120,8 +122,6 @@ function SuccessContent({ content, isFinal, finalMessage }: { content: PresentCo
     </motion.div>
     <p className="success-mark">Presente aberto. <Heart size={17} fill="currentColor" /></p>
     <p className="success-message">{content?.success_message}</p>
-    <p className="day-message">Agora aproveite o seu dia.</p>
-    <p className="hint-collection">Acho que já vou ter feito o pedido, mas caso não, junte as letras de todas as dicas e terá uma surpresa muito grande. Heheheh.</p>
     <div className="riddle-box"><span className="eyebrow">O próximo passo</span><p>{content?.riddle}</p>{content?.hint && <small>Dica: {content.hint}</small>}</div>
   </div>
 }
