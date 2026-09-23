@@ -1,8 +1,8 @@
 update public.presents as presents
 set
-  password_hash = crypt(contents.password, gen_salt('bf')),
+  password_hash = extensions.crypt(contents.password, extensions.gen_salt('bf')),
   question = '',
-  answer_hash = crypt('', gen_salt('bf')),
+  answer_hash = extensions.crypt('', extensions.gen_salt('bf')),
   success_message = contents.success_message,
   hint = contents.hint,
   riddle = contents.riddle,
