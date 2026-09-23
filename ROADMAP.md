@@ -80,4 +80,4 @@ Ao finalizar cada parte:
 - [x] Parte 7 — Progressão dos 19 presentes
 - [x] Parte 8 — Painel administrativo
 - [x] Parte 9 — Fotos, Storage e acabamento de UX
-- [ ] Parte 10 — Testes, documentação e deploy
+- [x] Parte 10 — Testes, documentação e deploy
