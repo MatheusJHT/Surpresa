@@ -76,6 +76,15 @@ update public.site_settings
 set admin_user_id = 'UUID_DO_USUARIO_ADMIN';
 ```
 
+Para conferir se o UUID está correto, execute:
+
+```sql
+select auth.uid() as usuario_logado, admin_user_id
+from public.site_settings;
+```
+
+`admin_user_id` precisa ser exatamente o UUID exibido em **Authentication > Users**, não o e-mail. Depois de aplicar uma migration nova, faça um novo deploy do frontend e das funções.
+
 8. Publique as Edge Functions:
 
 ```bash
