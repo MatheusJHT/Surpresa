@@ -2,13 +2,18 @@ export type Present = {
   id: string
   day_number: number
   title: string
+  is_active: boolean
+}
+
+export type PresentContent = {
+  id: string
+  day_number: number
+  title: string
   question: string
   success_message: string
   riddle: string
   photo_url: string | null
   hint: string | null
-  normalize_accents: boolean
-  ignore_punctuation: boolean
   is_active: boolean
 }
 

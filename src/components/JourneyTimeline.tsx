@@ -1,4 +1,5 @@
 import { Check, Heart, LockKeyhole } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import type { Present, UserProgress } from '../types/database'
 
 type JourneyTimelineProps = {
@@ -16,8 +17,8 @@ export function JourneyTimeline({ presents, progress }: JourneyTimelineProps) {
         const completed = completedIds.has(present.id)
         const available = present.id === nextPresentId
         const status = completed ? 'completed' : available ? 'available' : 'locked'
-        return (
-          <article className={`timeline-item ${status}`} key={present.id} aria-label={`Dia ${present.day_number}: ${status}`}>
+        const content = (
+          <>
             <div className="timeline-marker">
               {completed ? <Check size={17} aria-hidden="true" /> : available ? <Heart size={16} aria-hidden="true" /> : <LockKeyhole size={15} aria-hidden="true" />}
             </div>
@@ -25,8 +26,9 @@ export function JourneyTimeline({ presents, progress }: JourneyTimelineProps) {
               <span>Dia {String(present.day_number).padStart(2, '0')}</span>
               <strong>{completed ? 'Concluído' : available ? 'Disponível' : 'Bloqueado'}</strong>
             </div>
-          </article>
+          </>
         )
+        return available ? <Link className={`timeline-item ${status}`} to={`/presente/${present.id}`} key={present.id} aria-label={`Abrir dia ${present.day_number}`}>{content}</Link> : <article className={`timeline-item ${status}`} key={present.id} aria-label={`Dia ${present.day_number}: ${status}`}>{content}</article>
       })}
     </div>
   )

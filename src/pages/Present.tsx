@@ -1,0 +1,98 @@
+import { ArrowLeft, Heart, KeyRound, Send } from 'lucide-react'
+import { useEffect, useState, type FormEvent } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+import { getPresentContent, getPublicPresents, validateAnswer, validatePresentPassword } from '../services/presents'
+import { getMyProgress } from '../services/progress'
+import { isSupabaseConfigured } from '../services/supabase'
+import type { Present, PresentContent } from '../types/database'
+
+type Step = 'password' | 'question' | 'success'
+
+export function PresentPage() {
+  const { presentId = '' } = useParams()
+  const { user } = useAuth()
+  const navigate = useNavigate()
+  const [summary, setSummary] = useState<Present | null>(null)
+  const [content, setContent] = useState<PresentContent | null>(null)
+  const [step, setStep] = useState<Step>('password')
+  const [value, setValue] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    if (!isSupabaseConfigured || !presentId) return
+    void Promise.all([getPublicPresents(), getMyProgress()]).then(async ([presents, progress]) => {
+      const selected = presents.find((present) => present.id === presentId) ?? null
+      setSummary(selected)
+      const current = progress.find((item) => item.present_id === presentId)
+      if (current?.password_verified) {
+        const unlockedContent = await getPresentContent(presentId)
+        setContent(unlockedContent)
+        if (current.completed) setStep('success')
+        else if (unlockedContent) setStep('question')
+      }
+    }).catch(() => setError('Nossa história encontrou um pequeno obstáculo. Tente novamente.'))
+  }, [presentId])
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!presentId || !value.trim()) return
+    setBusy(true)
+    setError('')
+    try {
+      if (step === 'password') {
+        const valid = await validatePresentPassword(presentId, value)
+        if (!valid) {
+          setError('Hmm... essa não parece ser a senha que veio com o presente. ❤️')
+        } else {
+          setContent(await getPresentContent(presentId))
+          setStep('question')
+          setValue('')
+        }
+      } else if (step === 'question') {
+        const correct = await validateAnswer(presentId, value)
+        if (!correct) setError('Ainda não... pense mais um pouquinho. Eu sei que você lembra. ❤️')
+        else {
+          setStep('success')
+          setValue('')
+        }
+      }
+    } catch {
+      setError('Parece que nossa história encontrou um pequeno obstáculo. Tente novamente.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  if (!summary && isSupabaseConfigured && !error) return <main className="centered-page"><p className="eyebrow">Abrindo o presente...</p></main>
+
+  return (
+    <main className="app-shell present-page">
+      <nav className="topbar" aria-label="Navegação do presente">
+        <button className="back-link" type="button" onClick={() => navigate('/jornada')}><ArrowLeft size={16} /> Voltar para a jornada</button>
+        <span className="brand-mark">Dia {String(summary?.day_number ?? '?').padStart(2, '0')}</span>
+      </nav>
+      <section className="present-card" aria-labelledby="present-title">
+        <p className="eyebrow">{step === 'password' ? 'Uma nova surpresa' : step === 'question' ? 'Antes de continuar' : 'Mais um capítulo nosso'}</p>
+        <div className="present-icon">{step === 'password' ? <KeyRound size={26} /> : <Heart size={26} fill="currentColor" />}</div>
+        <h1 id="present-title">{summary?.title ?? 'Um presente para você'}</h1>
+        {step === 'password' && <p className="hero-description">Digite a senha que veio junto com o presente físico.</p>}
+        {step === 'question' && <><p className="hero-description">{content?.question ?? 'Uma pergunta está esperando por você.'}</p></>}
+        {step === 'success' && <SuccessContent content={content} />}
+        {step !== 'success' && <form className="present-form" onSubmit={handleSubmit}>
+          <label htmlFor="present-answer">{step === 'password' ? 'Senha do presente' : 'Sua resposta'}</label>
+          <input id="present-answer" type={step === 'password' ? 'password' : 'text'} value={value} onChange={(event) => setValue(event.target.value)} autoComplete="off" required autoFocus />
+          {error && <p className="form-error" role="alert">{error}</p>}
+          <button className="primary-button" type="submit" disabled={busy}>{busy ? 'Pensando...' : step === 'password' ? 'Abrir presente' : 'Responder'} <Send size={16} /></button>
+        </form>}
+        {step === 'success' && <Link className="primary-button" to="/jornada">Voltar para a jornada <Heart size={16} fill="currentColor" /></Link>}
+        <span className="user-note">{user?.email ?? 'Nossa história'}</span>
+      </section>
+    </main>
+  )
+}
+
+function SuccessContent({ content }: { content: PresentContent | null }) {
+  return <div className="success-content"><p className="success-mark">Você acertou. <Heart size={17} fill="currentColor" /></p><p>{content?.success_message}</p><div className="riddle-box"><span className="eyebrow">O próximo passo</span><p>{content?.riddle}</p>{content?.hint && <small>Dica: {content.hint}</small>}</div></div>
+}

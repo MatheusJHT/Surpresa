@@ -58,7 +58,7 @@ h1 span { color: var(--rose-dark); display: block; font-style: italic; }
 .journey-board { border-top: 1px solid var(--line); padding-bottom: 90px; padding-top: 48px; }
 .section-heading { align-items: end; display: flex; justify-content: space-between; }
 .journey-timeline { display: grid; gap: 10px; grid-template-columns: repeat(5, 1fr); margin-top: 42px; }
-.timeline-item { align-items: center; background: rgba(255,255,255,0.48); border: 1px solid var(--line); display: flex; gap: 12px; min-height: 76px; padding: 12px; }
+.timeline-item { align-items: center; background: rgba(255,255,255,0.48); border: 1px solid var(--line); color: inherit; display: flex; gap: 12px; min-height: 76px; padding: 12px; text-decoration: none; }
 .timeline-item.available { background: #f2e0df; border-color: var(--rose); }
 .timeline-item.completed { border-color: rgba(181,131,141,0.55); }
 .timeline-marker { align-items: center; border: 1px solid currentColor; border-radius: 50%; display: inline-flex; flex: 0 0 30px; height: 30px; justify-content: center; width: 30px; }
@@ -69,6 +69,23 @@ h1 span { color: var(--rose-dark); display: block; font-style: italic; }
 .timeline-copy strong { color: var(--ink); font-size: 0.82rem; font-weight: 600; }
 .journey-status { color: var(--muted); margin: 42px 0 0; }
 .logout-button { align-items: center; background: transparent; border: 0; color: var(--muted); cursor: pointer; display: inline-flex; gap: 7px; padding: 8px 0; }
+.present-page { background: #f7f1ed; min-height: 100vh; }
+.present-page > .topbar { max-width: 900px; width: 100%; }
+.present-page .back-link { background: transparent; border: 0; color: var(--muted); cursor: pointer; margin: 0; padding: 8px 0; }
+.present-card { margin: 48px auto 100px; max-width: 680px; padding: 30px 22px; text-align: center; }
+.present-icon { align-items: center; background: #f2e0df; border-radius: 50%; color: var(--rose-dark); display: inline-flex; height: 64px; justify-content: center; margin: 12px 0 24px; width: 64px; }
+.present-card h1 { font-size: clamp(2.8rem, 7vw, 5.5rem); }
+.present-form { display: grid; gap: 10px; margin: 34px auto 0; max-width: 440px; text-align: left; }
+.present-form label { color: var(--ink); font-size: 0.78rem; font-weight: 600; }
+.present-form input { background: white; border: 1px solid var(--line); color: var(--ink); font: inherit; padding: 15px; width: 100%; }
+.present-form input:focus { border-color: var(--rose-dark); outline: 3px solid rgba(181,131,141,0.2); }
+.present-form .primary-button { border: 0; cursor: pointer; justify-content: center; margin-top: 14px; }
+.success-content { margin: 28px auto 34px; max-width: 520px; }
+.success-mark { align-items: center; color: var(--rose-dark); display: flex; font-family: 'Playfair Display', serif; font-size: 1.6rem; gap: 8px; justify-content: center; }
+.riddle-box { background: rgba(255,255,255,0.62); border: 1px solid var(--line); margin-top: 30px; padding: 24px; text-align: left; }
+.riddle-box .eyebrow { margin-bottom: 12px; }
+.riddle-box p { font-family: 'Playfair Display', serif; font-size: 1.35rem; line-height: 1.4; margin: 0 0 16px; }
+.riddle-box small { color: var(--muted); }
 .centered-page { align-items: flex-start; display: flex; flex-direction: column; justify-content: center; min-height: 100vh; padding: 40px; }
 .back-link { align-items: center; display: inline-flex; gap: 8px; margin-bottom: 72px; }
 .login-page { margin: 0 auto; max-width: 700px; }
@@ -100,4 +117,5 @@ h2 { font-size: clamp(2rem, 4vw, 3.4rem); margin: 0; }
   .journey-heading { padding-bottom: 54px; padding-top: 54px; }
   .journey-timeline { grid-template-columns: repeat(2, 1fr); }
   .timeline-item { min-height: 70px; }
+  .present-card { margin-top: 24px; }
 }

@@ -12,8 +12,7 @@ const fallbackPresents = Array.from({ length: 19 }, (_, index) => ({
   id: `preview-${index + 1}`,
   day_number: index + 1,
   title: `Presente ${String(index + 1).padStart(2, '0')}`,
-  question: '', success_message: '', riddle: '', photo_url: null, hint: null,
-  normalize_accents: true, ignore_punctuation: true, is_active: true,
+  is_active: true,
 })) satisfies Present[]
 
 export function JourneyPage() {
