@@ -73,7 +73,7 @@ Ao finalizar cada parte:
 
 - [x] Parte 1 — Roadmap e fundação do repositório
 - [x] Parte 2 — Scaffold do frontend
-- [ ] Parte 3 — Modelo de dados e segurança Supabase
+- [x] Parte 3 — Modelo de dados e segurança Supabase
 - [ ] Parte 4 — Autenticação e camada de serviços
 - [ ] Parte 5 — Home e jornada visual
 - [ ] Parte 6 — Edge Functions e fluxo de um presente
