@@ -3,12 +3,12 @@ import { motion } from 'framer-motion'
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { getPresentContent, getPublicPresents, getPublicSiteSettings, validateAnswer, validatePresentPassword } from '../services/presents'
+import { getPresentContent, getPublicPresents, getPublicSiteSettings, validatePresentPassword } from '../services/presents'
 import { getMyProgress } from '../services/progress'
 import { isSupabaseConfigured } from '../services/supabase'
 import type { Present, PresentContent } from '../types/database'
 
-type Step = 'password' | 'question' | 'success'
+type Step = 'password' | 'success'
 
 export function PresentPage() {
   const { presentId = '' } = useParams()
@@ -33,7 +33,7 @@ export function PresentPage() {
         const unlockedContent = await getPresentContent(presentId)
         setContent(unlockedContent)
         if (current.completed) setStep('success')
-        else if (unlockedContent) setStep('question')
+        else if (unlockedContent) setStep('success')
       }
     }).catch(() => setError('Nossa história encontrou um pequeno obstáculo. Tente novamente.'))
   }, [presentId])
@@ -50,13 +50,6 @@ export function PresentPage() {
           setError('Hmm... essa não parece ser a senha que veio com o presente. ❤️')
         } else {
           setContent(await getPresentContent(presentId))
-          setStep('question')
-          setValue('')
-        }
-      } else if (step === 'question') {
-        const correct = await validateAnswer(presentId, value)
-        if (!correct) setError('Ainda não... pense mais um pouquinho. Eu sei que você lembra. ❤️')
-        else {
           setStep('success')
           setValue('')
         }
@@ -77,17 +70,16 @@ export function PresentPage() {
         <span className="brand-mark">Dia {String(summary?.day_number ?? '?').padStart(2, '0')}</span>
       </nav>
       <section className="present-card" aria-labelledby="present-title">
-        <p className="eyebrow">{step === 'password' ? 'Uma nova surpresa' : step === 'question' ? 'Antes de continuar' : 'Mais um capítulo nosso'}</p>
+        <p className="eyebrow">{step === 'password' ? 'Uma nova surpresa' : 'Mais um capítulo nosso'}</p>
         <div className="present-icon">{step === 'password' ? <KeyRound size={26} /> : <Heart size={26} fill="currentColor" />}</div>
         <h1 id="present-title">{summary?.title ?? 'Um presente para você'}</h1>
         {step === 'password' && <p className="hero-description">Digite a senha que veio junto com o presente físico.</p>}
-        {step === 'question' && <><p className="hero-description">{content?.question ?? 'Uma pergunta está esperando por você.'}</p></>}
         {step === 'success' && <SuccessContent content={content} isFinal={summary?.day_number === 19} finalMessage={finalMessage} />}
         {step !== 'success' && <form className="present-form" onSubmit={handleSubmit}>
-          <label htmlFor="present-answer">{step === 'password' ? 'Senha do presente' : 'Sua resposta'}</label>
-          <input id="present-answer" type={step === 'password' ? 'password' : 'text'} value={value} onChange={(event) => setValue(event.target.value)} autoComplete="off" required autoFocus />
+          <label htmlFor="present-answer">Senha do presente</label>
+          <input id="present-answer" type="password" value={value} onChange={(event) => setValue(event.target.value)} autoComplete="off" required autoFocus />
           {error && <p className="form-error" role="alert">{error}</p>}
-          <button className="primary-button" type="submit" disabled={busy}>{busy ? 'Pensando...' : step === 'password' ? 'Abrir presente' : 'Responder'} <Send size={16} /></button>
+          <button className="primary-button" type="submit" disabled={busy}>{busy ? 'Abrindo...' : 'Abrir presente'} <Send size={16} /></button>
         </form>}
         {step === 'success' && <Link className="primary-button" to={summary?.day_number === 19 ? '/' : '/jornada'}>{summary?.day_number === 19 ? 'Reviver nossa história' : 'Voltar para a jornada'} <Heart size={16} fill="currentColor" /></Link>}
         <span className="user-note">{user?.email ?? 'Nossa história'}</span>

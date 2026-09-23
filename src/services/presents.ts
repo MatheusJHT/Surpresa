@@ -45,10 +45,3 @@ export async function validatePresentPassword(presentId: string, password: strin
   return data?.success === true
 }
 
-export async function validateAnswer(presentId: string, answer: string) {
-  const { data, error } = await supabase.functions.invoke<{ correct: boolean }>('validate-answer', {
-    body: { present_id: presentId, answer },
-  })
-  if (error) throw error
-  return data?.correct === true
-}

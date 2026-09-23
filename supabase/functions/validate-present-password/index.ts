@@ -26,7 +26,7 @@ Deno.serve(async (request) => {
   if (!valid) return json({ success: false })
 
   await admin.from('user_progress').upsert(
-    { user_id: user.id, present_id: present.id, password_verified: true },
+    { user_id: user.id, present_id: present.id, password_verified: true, question_answered: true, completed: true, completed_at: new Date().toISOString() },
     { onConflict: 'user_id,present_id' },
   )
   return json({ success: true })

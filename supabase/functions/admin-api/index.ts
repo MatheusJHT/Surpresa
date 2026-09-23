@@ -36,7 +36,7 @@ async function isAdmin(admin: ReturnType<typeof serviceClient>, userId: string) 
 
 async function getOverview(admin: ReturnType<typeof serviceClient>) {
   const [presentsResult, settingsResult, progressResult, carouselResult] = await Promise.all([
-    admin.from('presents').select('id,day_number,title,question,success_message,riddle,photo_url,hint,normalize_accents,ignore_punctuation,is_active').order('day_number'),
+    admin.from('presents').select('id,day_number,title,success_message,riddle,photo_url,hint,normalize_accents,ignore_punctuation,is_active').order('day_number'),
     admin.from('site_settings').select('id,site_title,site_subtitle,intro_message,final_message').limit(1).maybeSingle(),
     admin.from('user_progress').select('id,user_id,present_id,password_verified,question_answered,completed,attempts,completed_at,created_at,updated_at').order('created_at'),
     admin.from('carousel_images').select('id,image_url,caption,display_order,is_active,created_at').order('display_order'),

@@ -9,7 +9,6 @@ export type PresentContent = {
   id: string
   day_number: number
   title: string
-  question: string
   success_message: string
   riddle: string
   photo_url: string | null
@@ -45,7 +44,6 @@ export type UserProgress = {
 }
 
 export type AdminPresent = Present & {
-  question: string
   success_message: string
   riddle: string
   photo_url: string | null

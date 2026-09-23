@@ -1,6 +1,6 @@
 # 19 Anos, 19 Dias, 19 Presentes
 
-Experiência romântica de caça ao tesouro: cada presente físico entrega uma senha, cada senha libera uma pergunta e cada resposta abre o próximo capítulo.
+Experiência romântica de caça ao tesouro: cada presente físico entrega uma senha que libera a mensagem e o enigma do próximo capítulo.
 
 ## Stack
 
@@ -89,7 +89,6 @@ from public.site_settings;
 
 ```bash
 supabase functions deploy validate-present-password
-supabase functions deploy validate-answer
 supabase functions deploy get-present-content
 supabase functions deploy admin-api
 ```
@@ -104,10 +103,10 @@ As funções usam automaticamente `SUPABASE_URL`, `SUPABASE_ANON_KEY` e `SUPABAS
 
 ## Fluxo de segurança
 
-- Senhas físicas e respostas são armazenadas apenas como hashes bcrypt.
+- Senhas físicas são armazenadas apenas como hashes bcrypt.
 - `public_presents` expõe somente o índice dos dias.
-- Pergunta, mensagem e enigma são entregues por `get-present-content` somente depois de `password_verified`.
-- `validate-present-password` e `validate-answer` retornam somente booleanos.
+- Mensagem e enigma são entregues por `get-present-content` somente depois de `password_verified`.
+- `validate-present-password` retorna somente um booleano.
 - A progressão anterior é validada no backend antes de aceitar a próxima senha.
 - A usuária lê apenas seu próprio progresso por RLS.
 - O admin é identificado por `site_settings.admin_user_id` no banco.
@@ -154,4 +153,4 @@ supabase/
 - [ ] Variáveis `VITE_*` configuradas na Vercel.
 - [ ] `npm run test` executado.
 - [ ] `npm run build` executado.
-- [ ] Testados mobile, login, senha errada, resposta errada, retomada, reset e Dia 19.
+- [ ] Testados mobile, login, senha errada, retomada, reset e Dia 19.

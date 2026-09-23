@@ -20,7 +20,7 @@ Deno.serve(async (request) => {
 
   const { data: present } = await admin
     .from('presents')
-    .select('id, day_number, title, question, success_message, riddle, photo_url, hint, is_active')
+    .select('id, day_number, title, success_message, riddle, photo_url, hint, is_active')
     .eq('id', presentId)
     .eq('is_active', true)
     .maybeSingle()

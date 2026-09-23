@@ -45,7 +45,7 @@ export function JourneyPage() {
       </nav>
       <section className="journey-heading" aria-labelledby="journey-title">
         <p className="eyebrow">Nossa jornada</p>
-        <h1 id="journey-title">Cada resposta abre um novo capítulo.</h1>
+        <h1 id="journey-title">Cada senha abre um novo capítulo.</h1>
         <p className="hero-description">Uma surpresa de cada vez. O caminho só existe porque é nosso.</p>
         <span className="user-note">Acesso de {user?.email ?? 'você'}</span>
       </section>
