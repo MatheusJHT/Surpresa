@@ -1,4 +1,4 @@
-import { ArrowLeft, Gift, Heart, KeyRound, Send } from 'lucide-react'
+import { ArrowLeft, Gift, Heart, KeyRound, Send, Sparkles } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
@@ -9,6 +9,7 @@ import { isSupabaseConfigured } from '../services/supabase'
 import type { Present, PresentContent } from '../types/database'
 
 type Step = 'password' | 'success'
+type ProposalStep = 'closed' | 'question' | 'celebration'
 
 export function PresentPage() {
   const { presentId = '' } = useParams()
@@ -20,6 +21,8 @@ export function PresentPage() {
   const [value, setValue] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const [proposalAnswer, setProposalAnswer] = useState('')
+  const [proposalStep, setProposalStep] = useState<ProposalStep>('closed')
   const [finalMessage, setFinalMessage] = useState('19 anos, 19 dias, 19 presentes. E eu escolheria continuar vivendo nossa história ao seu lado.')
 
   useEffect(() => {
@@ -61,6 +64,15 @@ export function PresentPage() {
     }
   }
 
+  function handleProposalSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (proposalAnswer.trim().toLocaleLowerCase('pt-BR') === 'sim') {
+      setProposalStep('celebration')
+      return
+    }
+    setError('Pense com carinho e responda quando estiver pronta. ❤️')
+  }
+
   if (!summary && isSupabaseConfigured && !error) return <main className="centered-page"><p className="eyebrow">Abrindo o presente...</p></main>
 
   return (
@@ -74,14 +86,15 @@ export function PresentPage() {
         <div className="present-icon">{step === 'password' ? <KeyRound size={26} /> : <Heart size={26} fill="currentColor" />}</div>
         <h1 id="present-title">{summary?.title ?? 'Um presente para você'}</h1>
         {step === 'password' && <p className="hero-description">Digite a senha que veio junto com o presente físico.</p>}
-        {step === 'success' && <SuccessContent content={content} isFinal={summary?.day_number === 19} finalMessage={finalMessage} />}
+        {step === 'success' && summary?.day_number === 12 && proposalStep !== 'closed' ? <ProposalContent proposalStep={proposalStep} answer={proposalAnswer} error={error} onAnswerChange={setProposalAnswer} onSubmit={handleProposalSubmit} /> : step === 'success' && <SuccessContent content={content} isFinal={summary?.day_number === 19} finalMessage={finalMessage} />}
         {step !== 'success' && <form className="present-form" onSubmit={handleSubmit}>
           <label htmlFor="present-answer">Senha do presente</label>
           <input id="present-answer" type="password" value={value} onChange={(event) => setValue(event.target.value)} autoComplete="off" required autoFocus />
           {error && <p className="form-error" role="alert">{error}</p>}
           <button className="primary-button" type="submit" disabled={busy}>{busy ? 'Abrindo...' : 'Abrir presente'} <Send size={16} /></button>
         </form>}
-        {step === 'success' && <Link className="primary-button" to={summary?.day_number === 19 ? '/' : '/jornada'}>{summary?.day_number === 19 ? 'Reviver nossa história' : 'Voltar para a jornada'} <Heart size={16} fill="currentColor" /></Link>}
+        {step === 'success' && summary?.day_number === 12 && proposalStep === 'closed' && <button className="primary-button surprise-button" type="button" onClick={() => { setError(''); setProposalStep('question') }}>Abrir surpresa <Sparkles size={16} /></button>}
+        {step === 'success' && (summary?.day_number !== 12 || proposalStep === 'celebration') && <Link className="primary-button" to={summary?.day_number === 19 ? '/' : '/jornada'}>{summary?.day_number === 19 ? 'Reviver nossa história' : 'Voltar para a jornada'} <Heart size={16} fill="currentColor" /></Link>}
         <span className="user-note">{user?.email ?? 'Nossa história'}</span>
       </section>
     </main>
@@ -111,4 +124,30 @@ function SuccessContent({ content, isFinal, finalMessage }: { content: PresentCo
     <p className="hint-collection">Acho que já vou ter feito o pedido, mas caso não, junte as letras de todas as dicas e terá uma surpresa muito grande. Heheheh.</p>
     <div className="riddle-box"><span className="eyebrow">O próximo passo</span><p>{content?.riddle}</p>{content?.hint && <small>Dica: {content.hint}</small>}</div>
   </div>
+}
+
+function ProposalContent({ proposalStep, answer, error, onAnswerChange, onSubmit }: { proposalStep: ProposalStep; answer: string; error: string; onAnswerChange: (value: string) => void; onSubmit: (event: FormEvent<HTMLFormElement>) => void }) {
+  if (proposalStep === 'celebration') {
+    return <motion.div className="proposal-celebration" initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }}>
+      <div className="celebration-decor" aria-hidden="true">♥ ✦ ♥ ✦ ♥</div>
+      <Sparkles className="celebration-icon" size={42} aria-hidden="true" />
+      <p className="final-count">O começo do nosso para sempre</p>
+      <h2>Eu sabia que seria você.</h2>
+      <p>Então é oficial: agora começa o capítulo mais bonito da nossa história. Obrigado por escolher viver a vida comigo. Eu te amo, hoje e todos os dias que ainda vamos construir.</p>
+      <div className="celebration-decor" aria-hidden="true">✦ ♥ ✦ ♥ ✦</div>
+    </motion.div>
+  }
+
+  return <motion.div className="proposal-question" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+    <div className="proposal-ring" aria-hidden="true"><Heart size={28} fill="currentColor" /></div>
+    <p className="eyebrow">Uma pergunta muito especial</p>
+    <h2>Qual é a sua resposta?</h2>
+    <p className="hero-description">Responda com o coração. ❤️</p>
+    <form className="present-form" onSubmit={onSubmit}>
+      <label htmlFor="proposal-answer">Sua resposta</label>
+      <input id="proposal-answer" type="text" value={answer} onChange={(event) => onAnswerChange(event.target.value)} autoComplete="off" autoFocus required />
+      {error && <p className="form-error" role="alert">{error}</p>}
+      <button className="primary-button" type="submit">Responder <Heart size={16} fill="currentColor" /></button>
+    </form>
+  </motion.div>
 }
