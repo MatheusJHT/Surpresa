@@ -78,6 +78,6 @@ Ao finalizar cada parte:
 - [x] Parte 5 — Home e jornada visual
 - [x] Parte 6 — Edge Functions e fluxo de um presente
 - [x] Parte 7 — Progressão dos 19 presentes
-- [ ] Parte 8 — Painel administrativo
+- [x] Parte 8 — Painel administrativo
 - [ ] Parte 9 — Fotos, Storage e acabamento de UX
 - [ ] Parte 10 — Testes, documentação e deploy

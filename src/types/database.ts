@@ -43,3 +43,25 @@ export type UserProgress = {
   created_at: string
   updated_at: string
 }
+
+export type AdminPresent = Present & {
+  question: string
+  success_message: string
+  riddle: string
+  photo_url: string | null
+  hint: string | null
+  normalize_accents: boolean
+  ignore_punctuation: boolean
+}
+
+export type AdminCarouselImage = CarouselImage & {
+  is_active: boolean
+  created_at: string
+}
+
+export type AdminOverview = {
+  presents: AdminPresent[]
+  settings: (SiteSettings & { id: string }) | null
+  progress: UserProgress[]
+  carousel: AdminCarouselImage[]
+}
