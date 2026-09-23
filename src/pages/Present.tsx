@@ -1,8 +1,9 @@
 import { ArrowLeft, Heart, KeyRound, Send } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { getPresentContent, getPublicPresents, validateAnswer, validatePresentPassword } from '../services/presents'
+import { getPresentContent, getPublicPresents, getPublicSiteSettings, validateAnswer, validatePresentPassword } from '../services/presents'
 import { getMyProgress } from '../services/progress'
 import { isSupabaseConfigured } from '../services/supabase'
 import type { Present, PresentContent } from '../types/database'
@@ -19,12 +20,14 @@ export function PresentPage() {
   const [value, setValue] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const [finalMessage, setFinalMessage] = useState('19 anos, 19 dias, 19 presentes. E eu escolheria continuar vivendo nossa história ao seu lado.')
 
   useEffect(() => {
     if (!isSupabaseConfigured || !presentId) return
-    void Promise.all([getPublicPresents(), getMyProgress()]).then(async ([presents, progress]) => {
+    void Promise.all([getPublicPresents(), getMyProgress(), getPublicSiteSettings()]).then(async ([presents, progress, settings]) => {
       const selected = presents.find((present) => present.id === presentId) ?? null
       setSummary(selected)
+      if (settings?.final_message) setFinalMessage(settings.final_message)
       const current = progress.find((item) => item.present_id === presentId)
       if (current?.password_verified) {
         const unlockedContent = await getPresentContent(presentId)
@@ -79,20 +82,30 @@ export function PresentPage() {
         <h1 id="present-title">{summary?.title ?? 'Um presente para você'}</h1>
         {step === 'password' && <p className="hero-description">Digite a senha que veio junto com o presente físico.</p>}
         {step === 'question' && <><p className="hero-description">{content?.question ?? 'Uma pergunta está esperando por você.'}</p></>}
-        {step === 'success' && <SuccessContent content={content} />}
+        {step === 'success' && <SuccessContent content={content} isFinal={summary?.day_number === 19} finalMessage={finalMessage} />}
         {step !== 'success' && <form className="present-form" onSubmit={handleSubmit}>
           <label htmlFor="present-answer">{step === 'password' ? 'Senha do presente' : 'Sua resposta'}</label>
           <input id="present-answer" type={step === 'password' ? 'password' : 'text'} value={value} onChange={(event) => setValue(event.target.value)} autoComplete="off" required autoFocus />
           {error && <p className="form-error" role="alert">{error}</p>}
           <button className="primary-button" type="submit" disabled={busy}>{busy ? 'Pensando...' : step === 'password' ? 'Abrir presente' : 'Responder'} <Send size={16} /></button>
         </form>}
-        {step === 'success' && <Link className="primary-button" to="/jornada">Voltar para a jornada <Heart size={16} fill="currentColor" /></Link>}
+        {step === 'success' && <Link className="primary-button" to={summary?.day_number === 19 ? '/' : '/jornada'}>{summary?.day_number === 19 ? 'Reviver nossa história' : 'Voltar para a jornada'} <Heart size={16} fill="currentColor" /></Link>}
         <span className="user-note">{user?.email ?? 'Nossa história'}</span>
       </section>
     </main>
   )
 }
 
-function SuccessContent({ content }: { content: PresentContent | null }) {
+function SuccessContent({ content, isFinal, finalMessage }: { content: PresentContent | null; isFinal: boolean; finalMessage: string }) {
+  if (isFinal) {
+    return <div className="success-content final-celebration">
+      <div className="heart-burst" aria-hidden="true">{Array.from({ length: 9 }, (_, index) => <motion.span key={index} animate={{ y: [0, -18 - index * 3, 0], opacity: [0.3, 1, 0.3] }} transition={{ duration: 2 + index * 0.15, repeat: Infinity, delay: index * 0.12 }}>♥</motion.span>)}</div>
+      <p className="final-count">19 / 19</p>
+      <p className="success-mark">Você chegou até o fim. <Heart size={17} fill="currentColor" /></p>
+      <p className="final-message">{finalMessage}</p>
+      <div className="riddle-box"><span className="eyebrow">O presente final</span><p>{content?.success_message}</p><small>Obrigada por viver cada capítulo comigo.</small></div>
+    </div>
+  }
+
   return <div className="success-content"><p className="success-mark">Você acertou. <Heart size={17} fill="currentColor" /></p><p>{content?.success_message}</p><div className="riddle-box"><span className="eyebrow">O próximo passo</span><p>{content?.riddle}</p>{content?.hint && <small>Dica: {content.hint}</small>}</div></div>
 }

@@ -52,6 +52,7 @@ export function JourneyPage() {
       <section className="journey-board" aria-labelledby="board-title">
         <div className="section-heading"><div><p className="eyebrow">O caminho</p><h2 id="board-title">19 presentes</h2></div><span className="progress-count">{progress.filter((item) => item.completed).length} / 19</span></div>
         {loading ? <p className="journey-status">Abrindo cada capítulo...</p> : <JourneyTimeline presents={presents} progress={progress} />}
+        {!loading && progress.filter((item) => item.completed).length === 19 && <p className="journey-complete">Todos os capítulos foram vividos. A história continua. <span aria-hidden="true">♥</span></p>}
         {loadError && <p className="connection-note" role="status">Não conseguimos sincronizar seu progresso agora. Mostrando a última estrutura disponível.</p>}
       </section>
     </main>
