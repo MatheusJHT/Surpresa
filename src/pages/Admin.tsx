@@ -1,9 +1,10 @@
-import { Check, ChevronDown, LogOut, Save, ShieldAlert } from 'lucide-react'
+import { Check, LogOut, Save, ShieldAlert, Trash2, Upload } from 'lucide-react'
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { getAdminOverview, resetJourneyProgress, saveAdminCarousel, saveAdminPresent, saveAdminSettings } from '../services/admin'
-import type { AdminOverview, AdminPresent } from '../types/database'
+import { createAdminCarousel, deleteAdminCarousel, getAdminOverview, resetJourneyProgress, saveAdminCarousel, saveAdminPresent, saveAdminSettings } from '../services/admin'
+import { removeCarouselImage, storagePathFromUrl, uploadCarouselImage } from '../services/storage'
+import type { AdminOverview, AdminPresent, AdminCarouselImage } from '../types/database'
 
 type AdminTab = 'overview' | 'presents' | 'photos' | 'settings' | 'progress'
 
@@ -66,6 +67,23 @@ function fieldLabel(field: string) { return ({ title: 'Título', password: 'Nova
 
 function SettingsEditor({ settings, onSaved }: { settings: NonNullable<AdminOverview['settings']>; onSaved: () => Promise<void> }) { const [form, setForm] = useState(settings); async function submit(event: FormEvent) { event.preventDefault(); await saveAdminSettings(form); await onSaved() } return <form className="admin-form" onSubmit={submit}>{(['site_title', 'site_subtitle', 'intro_message', 'final_message'] as const).map((field) => <label key={field}>{fieldLabel(field)}<textarea value={form[field]} onChange={(event) => setForm({ ...form, [field]: event.target.value })} /></label>)}<button className="primary-button" type="submit"><Save size={16} /> Salvar configurações</button></form> }
 
-function PhotoEditor({ overview, onSaved }: { overview: AdminOverview | null; onSaved: () => Promise<void> }) { const image = overview?.carousel[0]; const [caption, setCaption] = useState(image?.caption ?? ''); if (!image) return <div className="admin-panel"><h2>Nenhuma foto cadastrada.</h2><p className="hero-description">O upload para o Storage será habilitado na próxima etapa.</p></div>; return <form className="admin-form" onSubmit={async (event) => { event.preventDefault(); await saveAdminCarousel({ image_id: image.id, caption, display_order: image.display_order, is_active: image.is_active }); await onSaved() }}><img className="admin-photo-preview" src={image.image_url} alt={image.caption ?? 'Foto cadastrada'} /><label>Legenda<input value={caption} onChange={(event) => setCaption(event.target.value)} /></label><button className="primary-button" type="submit"><Save size={16} /> Salvar legenda</button></form> }
+function PhotoEditor({ overview, onSaved }: { overview: AdminOverview | null; onSaved: () => Promise<void> }) {
+  const [uploading, setUploading] = useState(false)
+  const [caption, setCaption] = useState('')
+  const [photoError, setPhotoError] = useState('')
+  async function addPhoto(file: File) {
+    setUploading(true); setPhotoError('')
+    try { const uploaded = await uploadCarouselImage(file); await createAdminCarousel({ image_url: uploaded.url, caption, display_order: overview?.carousel.length ?? 0 }); setCaption(''); await onSaved() } catch { setPhotoError('Não foi possível enviar essa foto.') } finally { setUploading(false) }
+  }
+  async function replacePhoto(image: AdminCarouselImage, file: File) {
+    setUploading(true); setPhotoError('')
+    try { const uploaded = await uploadCarouselImage(file); await saveAdminCarousel({ image_id: image.id, caption: image.caption ?? '', display_order: image.display_order, is_active: image.is_active, image_url: uploaded.url }); const oldPath = storagePathFromUrl(image.image_url); if (oldPath) await removeCarouselImage(oldPath); await onSaved() } catch { setPhotoError('Não foi possível substituir essa foto.') } finally { setUploading(false) }
+  }
+  async function removePhoto(image: AdminCarouselImage) {
+    if (!window.confirm('Excluir esta foto do carrossel?')) return
+    try { const path = storagePathFromUrl(image.image_url); if (path) await removeCarouselImage(path); await deleteAdminCarousel(image.id); await onSaved() } catch { setPhotoError('Não foi possível excluir essa foto.') }
+  }
+  return <div className="photo-manager"><div className="upload-panel"><p className="eyebrow">Nova memória</p><label className="upload-button"><Upload size={16} /> {uploading ? 'Enviando...' : 'Escolher foto'}<input type="file" accept="image/jpeg,image/png,image/webp" disabled={uploading} onChange={(event) => { const file = event.target.files?.[0]; if (file) void addPhoto(file) }} /></label><label>Legenda<input value={caption} onChange={(event) => setCaption(event.target.value)} placeholder="Uma frase para acompanhar a foto" /></label></div>{photoError && <p className="form-error" role="alert">{photoError}</p>}<div className="photo-grid">{(overview?.carousel ?? []).map((image) => <article className="photo-item" key={image.id}><img src={image.image_url} alt={image.caption ?? 'Foto da memória'} /><div><span>{image.caption || 'Sem legenda'}</span><label className="replace-button">Substituir<input type="file" accept="image/jpeg,image/png,image/webp" disabled={uploading} onChange={(event) => { const file = event.target.files?.[0]; if (file) void replacePhoto(image, file) }} /></label><button type="button" className="icon-danger" aria-label="Excluir foto" onClick={() => void removePhoto(image)}><Trash2 size={16} /></button></div></article>)}</div></div>
+}
 
 function ProgressPanel({ overview, onReset }: { overview: AdminOverview | null; onReset: () => Promise<void> }) { return <div className="admin-panel"><div className="section-heading"><div><p className="eyebrow">Acompanhamento</p><h2>{overview?.progress.filter((item) => item.completed).length ?? 0} capítulos concluídos</h2></div><button className="danger-button" type="button" onClick={() => void onReset()}>Resetar jornada</button></div><div className="progress-table">{(overview?.progress ?? []).map((item) => <div key={item.id}><span>{item.present_id}</span><strong>{item.completed ? 'Concluído' : item.password_verified ? 'Pergunta pendente' : 'Aguardando senha'}</strong><small>{item.attempts} tentativas</small></div>)}</div></div> }

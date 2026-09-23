@@ -32,3 +32,11 @@ export function resetJourneyProgress() {
 export function saveAdminCarousel(payload: Record<string, unknown>) {
   return adminRequest<{ saved: boolean }>({ action: 'update_carousel', ...payload })
 }
+
+export function createAdminCarousel(payload: Record<string, unknown>) {
+  return adminRequest<{ saved: boolean }>({ action: 'create_carousel', ...payload })
+}
+
+export function deleteAdminCarousel(imageId: string) {
+  return adminRequest<{ deleted: boolean }>({ action: 'delete_carousel', image_id: imageId })
+}

@@ -103,6 +103,18 @@ h1 span { color: var(--rose-dark); display: block; font-style: italic; }
 .progress-table span, .progress-table small { color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.68rem; }
 .progress-table strong { font-size: 0.84rem; font-weight: 500; }
 .admin-photo-preview { aspect-ratio: 16 / 7; display: block; max-width: 620px; object-fit: cover; width: 100%; }
+.photo-manager { display: grid; gap: 24px; }
+.upload-panel { background: rgba(255,255,255,0.6); border: 1px solid var(--line); display: grid; gap: 14px; max-width: 620px; padding: 24px; }
+.upload-button, .replace-button { align-items: center; border: 1px solid var(--rose-dark); color: var(--rose-dark); cursor: pointer; display: inline-flex; gap: 8px; justify-content: center; padding: 12px 14px; width: fit-content; }
+.upload-button input, .replace-button input { height: 1px; opacity: 0; overflow: hidden; position: absolute; width: 1px; }
+.upload-button:focus-within, .replace-button:focus-within { outline: 3px solid rgba(181,131,141,0.24); }
+.photo-grid { display: grid; gap: 12px; grid-template-columns: repeat(3, 1fr); }
+.photo-item { background: rgba(255,255,255,0.6); border: 1px solid var(--line); }
+.photo-item img { aspect-ratio: 4 / 3; display: block; object-fit: cover; width: 100%; }
+.photo-item > div { align-items: center; display: flex; gap: 10px; justify-content: space-between; padding: 12px; }
+.photo-item span { color: var(--muted); font-size: 0.78rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.replace-button { border: 0; font-size: 0.72rem; padding: 5px 0; }
+.icon-danger { align-items: center; background: transparent; border: 0; color: #9f4756; cursor: pointer; display: inline-flex; padding: 5px; }
 .present-page { background: #f7f1ed; min-height: 100vh; }
 .present-page > .topbar { max-width: 900px; width: 100%; }
 .present-page .back-link { background: transparent; border: 0; color: var(--muted); cursor: pointer; margin: 0; padding: 8px 0; }
@@ -164,4 +176,5 @@ h2 { font-size: clamp(2rem, 4vw, 3.4rem); margin: 0; }
   .admin-stat-grid strong { font-size: 2.2rem; }
   .admin-success, .admin-feedback { padding-left: 22px; padding-right: 22px; }
   .progress-table > div { grid-template-columns: 1fr; gap: 6px; }
+  .photo-grid { grid-template-columns: 1fr; }
 }

@@ -20,6 +20,8 @@ Deno.serve(async (request) => {
       case 'update_settings': return json(await updateSettings(admin, body))
       case 'reset_progress': return json(await resetProgress(admin))
       case 'update_carousel': return json(await updateCarousel(admin, body))
+      case 'create_carousel': return json(await createCarousel(admin, body))
+      case 'delete_carousel': return json(await deleteCarousel(admin, body))
       default: return json({ error: 'Ação desconhecida.' }, 400)
     }
   } catch {
@@ -84,6 +86,7 @@ async function updateCarousel(admin: ReturnType<typeof serviceClient>, body: Rec
   const imageId = typeof body.image_id === 'string' ? body.image_id : ''
   if (!imageId) throw new Error('Imagem inválida')
   const update = {
+    ...(typeof body.image_url === 'string' ? { image_url: body.image_url } : {}),
     caption: typeof body.caption === 'string' ? body.caption : null,
     display_order: typeof body.display_order === 'number' ? body.display_order : 0,
     is_active: body.is_active !== false,
@@ -91,4 +94,23 @@ async function updateCarousel(admin: ReturnType<typeof serviceClient>, body: Rec
   const { error } = await admin.from('carousel_images').update(update).eq('id', imageId)
   if (error) throw error
   return { saved: true }
+}
+
+async function createCarousel(admin: ReturnType<typeof serviceClient>, body: Record<string, unknown>) {
+  if (typeof body.image_url !== 'string' || !body.image_url) throw new Error('Imagem inválida')
+  const { error } = await admin.from('carousel_images').insert({
+    image_url: body.image_url,
+    caption: typeof body.caption === 'string' ? body.caption : null,
+    display_order: typeof body.display_order === 'number' ? body.display_order : 0,
+    is_active: true,
+  })
+  if (error) throw error
+  return { saved: true }
+}
+
+async function deleteCarousel(admin: ReturnType<typeof serviceClient>, body: Record<string, unknown>) {
+  if (typeof body.image_id !== 'string' || !body.image_id) throw new Error('Imagem inválida')
+  const { error } = await admin.from('carousel_images').delete().eq('id', body.image_id)
+  if (error) throw error
+  return { deleted: true }
 }
