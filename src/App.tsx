@@ -1,6 +1,9 @@
-import { ArrowDown, Heart, LockKeyhole } from 'lucide-react'
+import { ArrowDown, Heart, LockKeyhole, LogOut } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { Link, Route, Routes } from 'react-router-dom'
+import { Link, Navigate, Route, Routes } from 'react-router-dom'
+import { ProtectedRoute } from './components/ProtectedRoute'
+import { useAuth } from './context/AuthContext'
+import { LoginPage } from './pages/Login'
 
 const days = Array.from({ length: 19 }, (_, index) => index + 1)
 
@@ -8,7 +11,9 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
-      <Route path="/jornada" element={<JourneyPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/jornada" element={<ProtectedRoute><JourneyPage /></ProtectedRoute>} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
 }
@@ -68,10 +73,20 @@ function HomePage() {
 }
 
 function JourneyPage() {
+  const { signOut, user } = useAuth()
+
+  async function handleSignOut() {
+    await signOut()
+  }
+
   return (
     <main className="app-shell centered-page">
       <p className="eyebrow">Nossa jornada</p>
       <h1>O primeiro capítulo está esperando.</h1>
+      <p className="hero-description">Acesso aberto para {user?.email ?? 'você'}.</p>
+      <button className="secondary-button" type="button" onClick={handleSignOut}>
+        Sair <LogOut size={16} aria-hidden="true" />
+      </button>
       <Link className="primary-button" to="/">Voltar ao início</Link>
     </main>
   )
